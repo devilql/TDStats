@@ -395,11 +395,23 @@ def printTeamPlayers( teamPlayers ):
             weapStat = player.PGStats
             print(" \t " + str(weapStat.Damage) + "\t" + str(weapStat.Shots) + "\t" + str(weapStat.Hits))
 
+def getFileCount( folder ):
+    count = 0
+    # Iterate directory
+    for path in os.listdir(folder):
+        # check if current path is a file
+        if os.path.isfile(os.path.join(folder, path)):
+            count += 1
+
+    return count
 
 def outputCSV( map ):
     folderName = "TD6 Stats/" + map.Teams[0].Name[:5] + " v " + map.Teams[1].Name[:5]
     os.makedirs( folderName, exist_ok = True )
-    outfileName = folderName + "/" + map.Date + " - " + map.Name + ".csv"
+    id = getFileCount( folderName )
+    outfileName = folderName + "/" + str(id+1) + " - " + map.Date + " - " + map.Name + ".csv"
+    print(f"Writing csv file: {outfileName}")
+    
     with open(outfileName, 'w') as outfile:
         writeHeader2( outfile )
 
@@ -408,14 +420,14 @@ def outputCSV( map ):
     return
 
 def writeHeader( outFile ):
-    header = ["Team Name", "Player Name", "Kills", "Deaths", "Damage Dealt", "Damage Taken", "SG Hits", "SG Shots", "GL Hits", "GL Shots",
+    header = ["Team Name", "Player Name", "Kills", "Deaths", "KDR","Damage Dealt", "Damage Taken", "NET", "SG Hits", "SG Shots", "GL Hits", "GL Shots",
                "RL Hits", "RL Shots", "LG Hits", "LG Shots","RG Hits", "RG Shots", "HMG Hits", "HMG Shots", "PG Hits", "PG Shots"]
     outFile.write( ','.join(header))
     outFile.write("\n")
     return
 
 def writeHeader2( outFile ):
-    header = ["Team Name", "Player Name", "Kills", "Deaths", "Damage Dealt", "Damage Taken", "SG Hits", "SG Shots", "SG acc", "GL Hits", "GL Shots",
+    header = ["Team Name", "Player Name", "Kills", "Deaths", "KDR", "Damage Dealt", "Damage Taken", "NET", "SG Hits", "SG Shots", "SG acc", "GL Hits", "GL Shots",
               "GL Acc", "RL Hits", "RL Shots", "RL Acc", "LG Hits", "LG Shots", "LG Acc", "RG Hits", "RG Shots", "RG Acc",  "HMG Hits", "HMG Shots"
               , "HMG Acc", "PG Hits", "PG Shots", "PG Acc"]
     outFile.write( ','.join(header))
@@ -436,8 +448,10 @@ def writeTeamStats( teamName, players, outFile ):
 
         line = line + addAttr( player, 'Kills')
         line = line + addAttr( player, 'Deaths')
+        line = line + ","
         line = line + addAttr( player, 'DamageDealt')
         line = line + addAttr( player, 'DamageReceived')
+        line = line + ","
         line = line + addWeap2( player, 'SGStats')
         line = line + addWeap2( player, 'GLStats')
         line = line + addWeap2( player, 'RLStats')
